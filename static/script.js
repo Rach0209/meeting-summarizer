@@ -1,10 +1,12 @@
 let currentMode = 'local';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   restoreGroqKey();
   bindModeTabEvents();
   bindGroqKeyEvent();
   loadOllamaModels();
+  await loadCustomPrompts();
+  initPromptUI();
 });
 
 // ── 설정 복원 ──────────────────────────────────────────
@@ -117,6 +119,7 @@ async function summarize() {
 
   const startTime = Date.now();
   try {
+    const prompt = getCurrentPrompt();
     const res = await fetch('/summarize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -126,6 +129,8 @@ async function summarize() {
         groq_key: document.getElementById('groq-key').value,
         ollama_model: ollamaModel,
         groq_model: groqModel,
+        system_prompt: prompt.system,
+        user_prompt: prompt.user,
       }),
     });
     const data = await res.json();
@@ -192,6 +197,145 @@ function bindCopyButtons() {
       });
     });
   });
+}
+
+async function loadPromptsPath() {
+  const res = await fetch('/api/settings');
+  const settings = await res.json();
+  if (settings.prompts_path) {
+    document.getElementById('prompts-path').value = settings.prompts_path;
+  }
+}
+
+// ── 프롬프트 템플릿 ────────────────────────────────────
+function initPromptUI() {
+  renderPromptSelect();
+  renderPromptList();
+
+  document.getElementById('prompt-manage-btn').addEventListener('click', () => {
+    renderPromptList();
+    document.getElementById('prompt-modal').classList.remove('hidden');
+    showPromptForm(false);
+  });
+  document.getElementById('prompt-modal-close').addEventListener('click', () => {
+    document.getElementById('prompt-modal').classList.add('hidden');
+  });
+  document.getElementById('prompt-modal').addEventListener('click', (e) => {
+    if (e.target !== e.currentTarget) return;
+    const formVisible = document.getElementById('prompt-form').style.display !== 'none';
+    const hasInput = document.getElementById('prompt-name').value ||
+                     document.getElementById('prompt-system').value ||
+                     document.getElementById('prompt-user').value;
+    if (formVisible && hasInput) {
+      if (!confirm('작성 중인 내용이 있어요. 닫을까요?')) return;
+    }
+    e.currentTarget.classList.add('hidden');
+  });
+  document.getElementById('prompt-add-btn').addEventListener('click', () => {
+    clearPromptForm();
+    showPromptForm(true);
+  });
+
+  // 저장 위치 설정
+  loadPromptsPath();
+  document.getElementById('browse-btn').addEventListener('click', async () => {
+    const res = await fetch('/api/browse');
+    const { path } = await res.json();
+    if (path) document.getElementById('prompts-path').value = path;
+  });
+  document.getElementById('path-save-btn').addEventListener('click', async () => {
+    const path = document.getElementById('prompts-path').value.trim();
+    await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompts_path: path }),
+    });
+    await loadCustomPrompts();
+    renderPromptList();
+    renderPromptSelect();
+    alert('저장 위치가 변경됐어요. 새 위치에서 템플릿을 불러왔습니다.');
+  });
+  document.getElementById('prompt-form-cancel').addEventListener('click', () => showPromptForm(false));
+  document.getElementById('prompt-form-save').addEventListener('click', savePromptForm);
+}
+
+function renderPromptSelect() {
+  const select = document.getElementById('prompt-select');
+  const current = select.value;
+  select.innerHTML = getAllPrompts()
+    .map(p => `<option value="${p.id}">${p.name}</option>`)
+    .join('');
+  if (current) select.value = current;
+}
+
+function renderPromptList() {
+  const list = document.getElementById('prompt-list');
+  list.innerHTML = getAllPrompts().map(p => {
+    const isBuiltIn = BUILT_IN_PROMPTS.some(b => b.id === p.id);
+    return `
+      <div class="prompt-list-item ${isBuiltIn ? 'built-in' : ''}">
+        <span class="item-name" data-id="${p.id}">${p.name}</span>
+        ${isBuiltIn ? '' : `<button class="btn-delete" data-id="${p.id}">✕</button>`}
+      </div>`;
+  }).join('');
+
+  list.querySelectorAll('.item-name').forEach(el => {
+    el.addEventListener('click', () => {
+      const p = getPromptById(el.dataset.id);
+      if (!p) return;
+      const isBuiltIn = BUILT_IN_PROMPTS.some(b => b.id === p.id);
+      if (isBuiltIn) return;
+      document.getElementById('prompt-edit-id').value = p.id;
+      document.getElementById('prompt-name').value = p.name;
+      document.getElementById('prompt-system').value = p.system;
+      document.getElementById('prompt-user').value = p.user;
+      document.getElementById('prompt-form-title').textContent = '템플릿 수정';
+      showPromptForm(true);
+    });
+  });
+
+  list.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm('삭제할까요?')) return;
+      await deleteCustomPrompt(btn.dataset.id);
+      renderPromptList();
+      renderPromptSelect();
+    });
+  });
+}
+
+function showPromptForm(show) {
+  document.getElementById('prompt-form').style.display = show ? 'flex' : 'none';
+  document.getElementById('prompt-add-btn').style.display = show ? 'none' : 'block';
+}
+
+function clearPromptForm() {
+  document.getElementById('prompt-edit-id').value = '';
+  document.getElementById('prompt-name').value = '';
+  document.getElementById('prompt-system').value = '';
+  document.getElementById('prompt-user').value = '';
+  document.getElementById('prompt-form-title').textContent = '새 템플릿 추가';
+}
+
+async function savePromptForm() {
+  const name = document.getElementById('prompt-name').value.trim();
+  const system = document.getElementById('prompt-system').value.trim();
+  const user = document.getElementById('prompt-user').value.trim();
+  if (!name || !system || !user) { alert('모든 항목을 입력해주세요.'); return; }
+  if (!user.includes('{text}')) { alert('유저 프롬프트에 {text} 가 포함되어야 합니다.'); return; }
+
+  const id = document.getElementById('prompt-edit-id').value || `custom_${Date.now()}`;
+  await saveCustomPrompt({ id, name, system, user });
+  renderPromptList();
+  renderPromptSelect();
+  showPromptForm(false);
+  clearPromptForm();
+}
+
+function getCurrentPrompt() {
+  const id = document.getElementById('prompt-select').value;
+  return getPromptById(id) || BUILT_IN_PROMPTS[0];
 }
 
 // ── 마크다운 포맷 ──────────────────────────────────────

@@ -70,16 +70,71 @@
     </div>
   </div>
 
+  <!-- 프롬프트 템플릿 선택 -->
+  <div class="prompt-bar">
+    <select id="prompt-select"></select>
+    <button class="btn-prompt-manage" id="prompt-manage-btn">관리</button>
+  </div>
+
   <div class="input-section">
-    <label>회의록 내용을 붙여넣으세요</label>
-    <textarea id="meeting-text" placeholder="예) 참석자: 홍길동, 김철수&#10;&#10;안건 1: 신규 기능 개발 일정..."></textarea>
+    <label>내용을 붙여넣으세요</label>
+    <textarea id="meeting-text" placeholder="텍스트를 붙여넣으세요..."></textarea>
     <button class="btn-submit" id="submit-btn">요약하기</button>
+  </div>
+
+  <!-- 프롬프트 관리 모달 -->
+  <div class="modal-overlay hidden" id="prompt-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3>프롬프트 템플릿 관리</h3>
+        <button class="modal-close" id="prompt-modal-close">✕</button>
+      </div>
+
+      <div class="prompt-modal-body">
+        <!-- 목록 -->
+        <div class="prompt-list" id="prompt-list"></div>
+
+        <!-- 추가/수정 폼 -->
+        <div class="prompt-form" id="prompt-form">
+          <h4 id="prompt-form-title">새 템플릿 추가</h4>
+          <input type="hidden" id="prompt-edit-id">
+          <div class="form-group">
+            <label>이름</label>
+            <input type="text" id="prompt-name" placeholder="예) 보고서 요약">
+          </div>
+          <div class="form-group">
+            <label>시스템 프롬프트 (AI 역할 지정)</label>
+            <textarea id="prompt-system" rows="2" placeholder="예) 당신은 문서 요약 전문가입니다."></textarea>
+          </div>
+          <div class="form-group">
+            <label>유저 프롬프트 <span class="hint">({text} 는 입력한 내용으로 자동 대체)</span></label>
+            <textarea id="prompt-user" rows="5" placeholder="예) 다음 내용을 요약해주세요:&#10;&#10;{text}"></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-cancel" id="prompt-form-cancel">취소</button>
+            <button class="btn-save" id="prompt-form-save">저장</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-add-prompt" id="prompt-add-btn">+ 새 템플릿 추가</button>
+
+      <div class="save-path-section">
+        <label>저장 위치</label>
+        <div class="save-path-row">
+          <input type="text" id="prompts-path" readonly placeholder="기본 위치 (앱 폴더)">
+          <button class="btn-browse" id="browse-btn">찾아보기</button>
+          <button class="btn-path-save" id="path-save-btn">적용</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="results" id="results"></div>
 
 </div>
 
+<script src="/static/prompts.js"></script>
 <script src="/static/script.js"></script>
 </body>
 </html>
