@@ -20,8 +20,45 @@
 
   <div class="settings">
     <div class="setting-group" id="setting-ollama">
-      <label>Ollama 모델</label>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+        <label style="margin:0">Ollama 모델</label>
+        <button class="btn-help" id="model-help-btn">?</button>
+      </div>
       <select id="ollama-model"><option value="">로딩 중...</option></select>
+      <span class="model-hint">추천: llama3.1:8b</span>
+    </div>
+
+    <!-- 모델 추천 모달 -->
+    <div class="modal-overlay hidden" id="model-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>로컬 모델 추천</h3>
+          <button class="modal-close" id="modal-close-btn">✕</button>
+        </div>
+        <table class="model-table">
+          <thead>
+            <tr><th>모델</th><th>용량</th><th>한국어</th><th>컨텍스트</th><th>설치 명령어</th></tr>
+          </thead>
+          <tbody>
+            <tr class="recommended">
+              <td><a href="https://ollama.com/library/llama3.1" target="_blank">llama3.1:8b</a> 👍</td>
+              <td>4.7GB</td><td>⭐⭐⭐</td><td>128k</td>
+              <td><code class="install-cmd">ollama pull llama3.1:8b</code></td>
+            </tr>
+            <tr>
+              <td><a href="https://ollama.com/library/gemma2" target="_blank">gemma2:9b</a></td>
+              <td>5.4GB</td><td>⭐⭐⭐</td><td>8k</td>
+              <td><code class="install-cmd">ollama pull gemma2:9b</code></td>
+            </tr>
+            <tr>
+              <td><a href="https://ollama.com/library/llama3.2" target="_blank">llama3.2:3b</a></td>
+              <td>2GB</td><td>⭐⭐</td><td>128k</td>
+              <td><code class="install-cmd">ollama pull llama3.2</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="modal-tip">모델명 클릭 시 Ollama 라이브러리 페이지로 이동합니다.</p>
+      </div>
     </div>
     <div class="setting-group hidden" id="setting-groq">
       <label>Groq API 키</label>

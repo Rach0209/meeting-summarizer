@@ -33,7 +33,10 @@ def list_groq_models():
         client = Groq(api_key=api_key)
         models = client.models.list()
         # 채팅 가능한 모델만 필터링 (whisper 등 제외)
-        names = sorted([m.id for m in models.data if "whisper" not in m.id and "guard" not in m.id])
+        names = sorted([
+            m.id for m in models.data
+            if not any(x in m.id for x in ("whisper", "guard", "vision", "tts"))
+        ])
         return jsonify({"models": names})
     except Exception:
         return jsonify({"models": []})

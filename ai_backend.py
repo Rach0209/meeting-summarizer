@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SYSTEM_PROMPT = """당신은 회의록 분석 전문가입니다.
-주어진 회의록을 명확하고 간결하게 정리해주세요."""
+주어진 회의록을 명확하고 간결하게 정리해주세요.
+한국어로 답변해주세요."""
 
-USER_PROMPT_TEMPLATE = """다음 회의록을 아래 형식으로 정리해주세요:
+USER_PROMPT_TEMPLATE = """다음 회의록을 한국어로 아래 형식에 맞게 정리해주세요:
 
 ## 핵심 요약
 (3줄 이내로 핵심 내용 요약)

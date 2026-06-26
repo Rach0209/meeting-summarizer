@@ -80,6 +80,15 @@ function loadGroqModels() {
 // ── 요약 ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('submit-btn').addEventListener('click', summarize);
+  document.getElementById('model-help-btn').addEventListener('click', () => {
+    document.getElementById('model-modal').classList.remove('hidden');
+  });
+  document.getElementById('modal-close-btn').addEventListener('click', () => {
+    document.getElementById('model-modal').classList.add('hidden');
+  });
+  document.getElementById('model-modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
+  });
 });
 
 async function summarize() {
