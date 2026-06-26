@@ -4,132 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회의록 자동 정리</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
-      color: #333;
-      min-height: 100vh;
-    }
-
-    header {
-      background: #1a1a2e;
-      color: white;
-      padding: 16px 24px;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
-
-    /* 모드 선택 */
-    .mode-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .mode-tab {
-      padding: 8px 20px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      background: white;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    .mode-tab.active {
-      border-color: #4f46e5;
-      background: #4f46e5;
-      color: white;
-    }
-
-    /* 설정 패널 */
-    .settings {
-      background: white;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-    }
-    .setting-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
-    .setting-group label { font-size: 12px; color: #666; font-weight: 500; }
-    .setting-group select,
-    .setting-group input {
-      padding: 8px 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .hidden { display: none !important; }
-
-    /* 입력 */
-    .input-section { background: white; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
-    .input-section label { font-size: 13px; color: #666; display: block; margin-bottom: 8px; }
-    textarea {
-      width: 100%;
-      height: 180px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 14px;
-      resize: vertical;
-      font-family: inherit;
-    }
-    .btn-submit {
-      margin-top: 12px;
-      padding: 10px 28px;
-      background: #4f46e5;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-submit:hover { background: #4338ca; }
-    .btn-submit:disabled { background: #a5a3e8; cursor: not-allowed; }
-
-    /* 결과 */
-    .results { display: flex; gap: 16px; }
-    .result-box {
-      flex: 1;
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      min-height: 200px;
-    }
-    .result-box .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    .result-box h3 { font-size: 15px; }
-    .badge {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 12px;
-      background: #f0f0f0;
-      color: #555;
-    }
-    .badge.local { background: #e0f2fe; color: #0369a1; }
-    .badge.cloud { background: #ede9fe; color: #6d28d9; }
-
-    .result-content { font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
-    .result-content h2 { font-size: 14px; margin: 12px 0 6px; color: #1a1a2e; }
-
-    .error-msg { color: #dc2626; font-size: 13px; }
-    .loading { color: #888; font-size: 13px; }
-
-    .timer { font-size: 11px; color: #999; margin-top: 10px; }
-  </style>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
@@ -137,171 +12,37 @@
 
 <div class="container">
 
-  <!-- 모드 선택 -->
   <div class="mode-tabs">
     <button class="mode-tab active" data-mode="local">🖥️ 로컬 (Ollama)</button>
     <button class="mode-tab" data-mode="internet">☁️ 인터넷 (Groq)</button>
     <button class="mode-tab" data-mode="compare">⚖️ 비교</button>
   </div>
 
-  <!-- 설정 -->
   <div class="settings">
     <div class="setting-group" id="setting-ollama">
       <label>Ollama 모델</label>
-      <select id="ollama-model"><option value="llama3.2">llama3.2 (로딩 중...)</option></select>
+      <select id="ollama-model"><option value="">로딩 중...</option></select>
     </div>
     <div class="setting-group hidden" id="setting-groq">
       <label>Groq API 키</label>
-      <input type="password" id="groq-key" placeholder="gsk_..." value="">
+      <input type="password" id="groq-key" placeholder="gsk_...">
+    </div>
+    <div class="setting-group hidden" id="setting-groq-model">
+      <label>Groq 모델</label>
+      <select id="groq-model"><option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option></select>
     </div>
   </div>
 
-  <!-- 입력 -->
   <div class="input-section">
     <label>회의록 내용을 붙여넣으세요</label>
     <textarea id="meeting-text" placeholder="예) 참석자: 홍길동, 김철수&#10;&#10;안건 1: 신규 기능 개발 일정..."></textarea>
-    <button class="btn-submit" id="submit-btn" onclick="summarize()">요약하기</button>
+    <button class="btn-submit" id="submit-btn">요약하기</button>
   </div>
 
-  <!-- 결과 -->
   <div class="results" id="results"></div>
 
 </div>
 
-<script>
-  let currentMode = 'local';
-
-  // 저장된 Groq 키 불러오기
-  document.getElementById('groq-key').value = localStorage.getItem('groq_key') || '';
-
-  // Groq 키 입력 시 자동 저장
-  document.getElementById('groq-key').addEventListener('input', (e) => {
-    localStorage.setItem('groq_key', e.target.value);
-  });
-
-  // 모드 탭 전환
-  document.querySelectorAll('.mode-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      currentMode = tab.dataset.mode;
-      updateSettingsVisibility();
-    });
-  });
-
-  function updateSettingsVisibility() {
-    const ollamaSetting = document.getElementById('setting-ollama');
-    const groqSetting = document.getElementById('setting-groq');
-    ollamaSetting.classList.toggle('hidden', currentMode === 'internet');
-    groqSetting.classList.toggle('hidden', currentMode === 'local');
-  }
-
-  // 설치된 Ollama 모델 목록 불러오기
-  fetch('/models')
-    .then(r => r.json())
-    .then(data => {
-      const select = document.getElementById('ollama-model');
-      if (data.models.length === 0) {
-        select.innerHTML = '<option value="">설치된 모델 없음</option>';
-        return;
-      }
-      select.innerHTML = data.models
-        .map(m => `<option value="${m}">${m}</option>`)
-        .join('');
-    })
-    .catch(() => {
-      document.getElementById('ollama-model').innerHTML = '<option value="">Ollama 연결 실패</option>';
-    });
-
-  async function summarize() {
-    const text = document.getElementById('meeting-text').value.trim();
-    if (!text) { alert('회의록 내용을 입력해주세요.'); return; }
-
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.textContent = '분석 중...';
-
-    // 결과 영역 초기화
-    const resultsEl = document.getElementById('results');
-    if (currentMode === 'compare') {
-      resultsEl.innerHTML = `
-        <div class="result-box" id="box-ollama">
-          <div class="result-header">
-            <h3>🖥️ Ollama (로컬)</h3>
-            <span class="badge local">llama3.2</span>
-          </div>
-          <div class="result-content loading">분석 중...</div>
-        </div>
-        <div class="result-box" id="box-groq">
-          <div class="result-header">
-            <h3>☁️ Groq (클라우드)</h3>
-            <span class="badge cloud">llama-3.1-70b</span>
-          </div>
-          <div class="result-content loading">분석 중...</div>
-        </div>`;
-    } else {
-      const label = currentMode === 'local' ? '🖥️ Ollama (로컬)' : '☁️ Groq (클라우드)';
-      const badge = currentMode === 'local' ? 'local' : 'cloud';
-      resultsEl.innerHTML = `
-        <div class="result-box" id="box-single">
-          <div class="result-header">
-            <h3>${label}</h3>
-            <span class="badge ${badge}">${currentMode === 'local' ? 'llama3.2' : 'llama-3.1-70b'}</span>
-          </div>
-          <div class="result-content loading">분석 중...</div>
-        </div>`;
-    }
-
-    const startTime = Date.now();
-
-    try {
-      const res = await fetch('/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text,
-          mode: currentMode,
-          groq_key: document.getElementById('groq-key').value,
-          ollama_model: document.getElementById('ollama-model').value,
-        }),
-      });
-      const data = await res.json();
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-
-      if (currentMode === 'compare') {
-        renderResult('box-ollama', data.ollama, data.ollama_error, elapsed);
-        renderResult('box-groq', data.groq, data.groq_error, elapsed);
-      } else {
-        const content = currentMode === 'local' ? data.ollama : data.groq;
-        const error = currentMode === 'local' ? data.ollama_error : data.groq_error;
-        renderResult('box-single', content, error, elapsed);
-      }
-    } catch (e) {
-      document.querySelector('.result-content').textContent = '서버 오류가 발생했습니다.';
-    }
-
-    btn.disabled = false;
-    btn.textContent = '요약하기';
-  }
-
-  function renderResult(boxId, content, error, elapsed) {
-    const box = document.getElementById(boxId);
-    const contentEl = box.querySelector('.result-content');
-    if (error) {
-      contentEl.innerHTML = `<span class="error-msg">${error}</span>`;
-    } else if (content) {
-      contentEl.innerHTML = formatMarkdown(content);
-      contentEl.insertAdjacentHTML('beforeend', `<div class="timer">⏱️ ${elapsed}초</div>`);
-    }
-  }
-
-  function formatMarkdown(text) {
-    return text
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^- (.+)$/gm, '• $1<br>')
-      .replace(/\n/g, '<br>');
-  }
-</script>
-
+<script src="/static/script.js"></script>
 </body>
 </html>

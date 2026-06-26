@@ -1,0 +1,141 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  min-height: 100vh;
+}
+
+header {
+  background: #1a1a2e;
+  color: white;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+/* 모드 탭 */
+.mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+
+.mode-tab {
+  padding: 8px 20px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.mode-tab.active {
+  border-color: #4f46e5;
+  background: #4f46e5;
+  color: white;
+}
+
+/* 설정 패널 */
+.settings {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.setting-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
+.setting-group label { font-size: 12px; color: #666; font-weight: 500; }
+.setting-group select,
+.setting-group input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* 입력 영역 */
+.input-section { background: white; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+.input-section label { font-size: 13px; color: #666; display: block; margin-bottom: 8px; }
+
+textarea {
+  width: 100%;
+  height: 180px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.btn-submit {
+  margin-top: 12px;
+  padding: 10px 28px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-submit:hover { background: #4338ca; }
+.btn-submit:disabled { background: #a5a3e8; cursor: not-allowed; }
+
+/* 결과 */
+.results { display: flex; gap: 16px; }
+
+.result-box {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  min-height: 200px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.result-header h3 { font-size: 15px; }
+.result-header-right { display: flex; gap: 6px; align-items: center; }
+
+.badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #f0f0f0;
+  color: #555;
+}
+.badge.local { background: #e0f2fe; color: #0369a1; }
+.badge.cloud { background: #ede9fe; color: #6d28d9; }
+
+.btn-copy {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-copy:hover { background: #f0f0f0; }
+.btn-copy.copied { border-color: #22c55e; color: #22c55e; }
+
+.result-content { font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+.result-content h2 { font-size: 14px; margin: 12px 0 6px; color: #1a1a2e; }
+
+.error-msg { color: #dc2626; font-size: 13px; }
+.loading { color: #888; font-size: 13px; }
+
+.timer { font-size: 11px; color: #bbb; text-align: right; margin-top: 8px; }
+
+.hidden { display: none !important; }

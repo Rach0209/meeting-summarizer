@@ -1,3 +1,4 @@
+import os
 import threading
 import webbrowser
 from flask import Flask, render_template, request, jsonify
@@ -12,12 +13,27 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/models", methods=["GET"])
-def list_models():
-    """설치된 Ollama 모델 목록 반환"""
+@app.route("/models/ollama", methods=["GET"])
+def list_ollama_models():
     try:
         models = ollama.list()
         names = [m.model for m in models.models]
+        return jsonify({"models": names})
+    except Exception:
+        return jsonify({"models": []})
+
+
+@app.route("/models/groq", methods=["GET"])
+def list_groq_models():
+    api_key = request.args.get("api_key") or os.getenv("GROQ_API_KEY", "")
+    if not api_key:
+        return jsonify({"models": []})
+    try:
+        from groq import Groq
+        client = Groq(api_key=api_key)
+        models = client.models.list()
+        # 채팅 가능한 모델만 필터링 (whisper 등 제외)
+        names = sorted([m.id for m in models.data if "whisper" not in m.id and "guard" not in m.id])
         return jsonify({"models": names})
     except Exception:
         return jsonify({"models": []})
@@ -27,9 +43,10 @@ def list_models():
 def summarize():
     data = request.get_json()
     text = data.get("text", "").strip()
-    mode = data.get("mode", "local")       # local | internet | compare
+    mode = data.get("mode", "local")
     groq_key = data.get("groq_key", "")
     ollama_model = data.get("ollama_model", "llama3.2")
+    groq_model = data.get("groq_model", "llama-3.3-70b-versatile")
 
     if not text:
         return jsonify({"error": "회의록 내용을 입력해주세요."}), 400
@@ -44,7 +61,7 @@ def summarize():
 
     if mode in ("internet", "compare"):
         try:
-            result["groq"] = summarize_with_groq(text, api_key=groq_key or None)
+            result["groq"] = summarize_with_groq(text, api_key=groq_key or None, model=groq_model)
         except Exception as e:
             result["groq_error"] = f"Groq 오류: {str(e)}"
 

@@ -36,11 +36,12 @@ def summarize_with_ollama(text: str, model: str = None) -> str:
     return response.message.content
 
 
-def summarize_with_groq(text: str, api_key: str = None) -> str:
+def summarize_with_groq(text: str, api_key: str = None, model: str = None) -> str:
     api_key = api_key or os.getenv("GROQ_API_KEY")
+    model = model or "llama-3.3-70b-versatile"
     client = Groq(api_key=api_key)
     response = client.chat.completions.create(
-        model="llama-3.1-70b-versatile",
+        model=model,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": USER_PROMPT_TEMPLATE.format(text=text)},
