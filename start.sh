@@ -6,4 +6,4 @@ echo "앱을 시작합니다..."
 ollama serve &>/dev/null &
 
 # Flask 서버 실행 (브라우저 자동으로 열림)
-python app.py
+venv/bin/python app.py

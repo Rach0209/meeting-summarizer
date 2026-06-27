@@ -6,4 +6,4 @@ echo 앱을 시작합니다...
 start /B ollama serve >nul 2>&1
 
 :: Flask 서버 실행 (브라우저 자동으로 열림)
-python app.py
+venv\Scripts\python.exe app.py
