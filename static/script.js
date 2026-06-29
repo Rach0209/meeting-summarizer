@@ -257,6 +257,25 @@ function initPromptUI() {
   });
   document.getElementById('prompt-form-cancel').addEventListener('click', () => showPromptForm(false));
   document.getElementById('prompt-form-save').addEventListener('click', savePromptForm);
+
+  // 내보내기 / 가져오기
+  document.getElementById('export-btn').addEventListener('click', exportCustomPrompts);
+  document.getElementById('import-btn').addEventListener('click', () => {
+    document.getElementById('import-file').value = '';
+    document.getElementById('import-file').click();
+  });
+  document.getElementById('import-file').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const count = await importCustomPrompts(file);
+      renderPromptList();
+      renderPromptSelect();
+      alert(`${count}개 템플릿을 가져왔어요.`);
+    } catch (err) {
+      alert(`가져오기 실패: ${err.message}`);
+    }
+  });
 }
 
 function renderPromptSelect() {

@@ -107,3 +107,37 @@ async function deleteCustomPrompt(id) {
   _customPrompts = _customPrompts.filter(p => p.id !== id);
   await persistCustomPrompts();
 }
+
+function exportCustomPrompts() {
+  if (!_customPrompts.length) {
+    alert('내보낼 커스텀 프롬프트가 없어요.');
+    return;
+  }
+  const blob = new Blob([JSON.stringify(_customPrompts, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'custom_prompts.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function importCustomPrompts(file) {
+  const text = await file.text();
+  let imported;
+  try {
+    imported = JSON.parse(text);
+  } catch {
+    throw new Error('JSON 파싱 오류: 파일 형식을 확인해주세요.');
+  }
+  if (!Array.isArray(imported)) throw new Error('올바른 프롬프트 파일이 아닙니다.');
+  const valid = imported.every(p => p.id && p.name && p.system && p.user);
+  if (!valid) throw new Error('필수 항목(id, name, system, user)이 누락된 항목이 있어요.');
+
+  // 기존과 합치되 id 중복 시 가져온 파일 기준으로 덮어씀
+  const map = new Map(_customPrompts.map(p => [p.id, p]));
+  imported.forEach(p => map.set(p.id, p));
+  _customPrompts = [...map.values()];
+  await persistCustomPrompts();
+  return imported.length;
+}

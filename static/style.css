@@ -259,6 +259,25 @@ textarea {
 }
 .btn-add-prompt:hover { border-color: #4f46e5; color: #4f46e5; }
 
+/* 내보내기/가져오기 */
+.import-export-section {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.btn-export, .btn-import {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: white;
+  color: #555;
+}
+.btn-export:hover { border-color: #4f46e5; color: #4f46e5; }
+.btn-import:hover { border-color: #059669; color: #059669; }
+
 /* 저장 위치 */
 .save-path-section {
   margin-top: 14px;
