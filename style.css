@@ -1,0 +1,397 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  min-height: 100vh;
+}
+
+header {
+  background: #1a1a2e;
+  color: white;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+/* 모드 탭 */
+.mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+
+.mode-tab {
+  padding: 8px 20px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.mode-tab.active {
+  border-color: #4f46e5;
+  background: #4f46e5;
+  color: white;
+}
+
+/* 설정 패널 */
+.settings {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.setting-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
+.setting-group label { font-size: 12px; color: #666; font-weight: 500; }
+.setting-group select,
+.setting-group input {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* 입력 영역 */
+.input-section { background: white; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+.input-section label { font-size: 13px; color: #666; display: block; margin-bottom: 8px; }
+
+textarea {
+  width: 100%;
+  height: 180px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.btn-submit {
+  margin-top: 12px;
+  padding: 10px 28px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-submit:hover { background: #4338ca; }
+.btn-submit:disabled { background: #a5a3e8; cursor: not-allowed; }
+
+/* 결과 */
+.results { display: flex; gap: 16px; }
+
+.result-box {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  min-height: 200px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.result-header h3 { font-size: 15px; }
+.result-header-right { display: flex; gap: 6px; align-items: center; }
+
+.badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #f0f0f0;
+  color: #555;
+}
+.badge.local { background: #e0f2fe; color: #0369a1; }
+.badge.cloud { background: #ede9fe; color: #6d28d9; }
+
+.btn-copy {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-copy:hover { background: #f0f0f0; }
+.btn-copy.copied { border-color: #22c55e; color: #22c55e; }
+
+.result-content { font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+.result-content h2 { font-size: 14px; margin: 12px 0 6px; color: #1a1a2e; }
+
+.error-msg { color: #dc2626; font-size: 13px; }
+.loading { color: #888; font-size: 13px; }
+
+.timer { font-size: 11px; color: #bbb; text-align: right; margin-top: 8px; }
+
+.hidden { display: none !important; }
+
+/* 프롬프트 바 */
+.prompt-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.prompt-bar select {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+}
+.btn-prompt-manage {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-prompt-manage:hover { background: #f5f5f5; }
+
+/* 프롬프트 관리 모달 */
+.modal-wide { width: 880px; }
+
+.prompt-modal-body {
+  display: flex;
+  gap: 16px;
+  height: 60dvh;
+}
+
+.prompt-list {
+  width: 200px;
+  flex-shrink: 0;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow-y: auto;
+}
+.prompt-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+}
+.prompt-list-item:hover { background: #f9f9f9; }
+.prompt-list-item.built-in { color: #555; }
+.prompt-list-item .item-name { flex: 1; }
+.prompt-list-item .btn-delete {
+  border: none;
+  background: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+}
+.prompt-list-item .btn-delete:hover { color: #ef4444; }
+
+.prompt-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+.prompt-form h4 { font-size: 14px; color: #333; }
+
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 12px; color: #666; font-weight: 500; }
+.form-group .hint { font-weight: 400; color: #aaa; }
+.form-group input,
+.form-group textarea {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+.btn-cancel {
+  padding: 7px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+.btn-save {
+  padding: 7px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #4f46e5;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+.btn-save:hover { background: #4338ca; }
+
+.btn-add-prompt {
+  margin-top: 14px;
+  width: 100%;
+  padding: 8px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  background: none;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+}
+.btn-add-prompt:hover { border-color: #4f46e5; color: #4f46e5; }
+
+/* 내보내기/가져오기 */
+.import-export-section {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.btn-export, .btn-import {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: white;
+  color: #555;
+}
+.btn-export:hover { border-color: #4f46e5; color: #4f46e5; }
+.btn-import:hover { border-color: #059669; color: #059669; }
+
+/* 저장 위치 */
+.save-path-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #eee;
+}
+.save-path-section label { font-size: 12px; color: #888; display: block; margin-bottom: 6px; }
+.save-path-row { display: flex; gap: 6px; }
+.save-path-row input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #555;
+  background: #fafafa;
+}
+.btn-browse, .btn-path-save {
+  padding: 7px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-browse:hover { background: #f5f5f5; }
+.btn-path-save { background: #4f46e5; color: white; border-color: #4f46e5; }
+.btn-path-save:hover { background: #4338ca; }
+
+/* 모델 힌트 */
+.model-hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+/* ? 버튼 */
+.btn-help {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: white;
+  font-size: 11px;
+  cursor: pointer;
+  color: #888;
+  line-height: 1;
+  padding: 0;
+}
+.btn-help:hover { border-color: #4f46e5; color: #4f46e5; }
+
+/* 모달 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 520px;
+  max-width: 90vw;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.modal-header h3 { font-size: 16px; }
+.modal-close {
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #888;
+}
+.modal-close:hover { color: #333; }
+
+.model-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.model-table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+.model-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+.model-table tr.recommended td { background: #faf5ff; font-weight: 500; }
+
+.modal-tip {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #888;
+}
+.modal-tip code {
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.model-table a { color: #4f46e5; text-decoration: none; }
+.model-table a:hover { text-decoration: underline; }
+
+.install-cmd {
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #333;
+  user-select: all;
+}

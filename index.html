@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Summarizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>📝 Simple Summarizer</header>
+
+<div class="container">
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="local">🖥️ 로컬 (Ollama)</button>
+    <button class="mode-tab" data-mode="internet">☁️ 인터넷 (Groq)</button>
+    <button class="mode-tab" data-mode="compare">⚖️ 비교</button>
+  </div>
+
+  <div class="settings">
+    <div class="setting-group" id="setting-ollama">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+        <label style="margin:0">Ollama 모델</label>
+        <button class="btn-help" id="model-help-btn">?</button>
+      </div>
+      <select id="ollama-model"><option value="">로딩 중...</option></select>
+      <span class="model-hint">추천: llama3.1:8b</span>
+    </div>
+
+    <!-- 모델 추천 모달 -->
+    <div class="modal-overlay hidden" id="model-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>로컬 모델 추천</h3>
+          <button class="modal-close" id="modal-close-btn">✕</button>
+        </div>
+        <table class="model-table">
+          <thead>
+            <tr><th>모델</th><th>용량</th><th>한국어</th><th>컨텍스트</th><th>설치 명령어</th></tr>
+          </thead>
+          <tbody>
+            <tr class="recommended">
+              <td><a href="https://ollama.com/library/llama3.1" target="_blank">llama3.1:8b</a> 👍</td>
+              <td>4.7GB</td><td>⭐⭐⭐</td><td>128k</td>
+              <td><code class="install-cmd">ollama pull llama3.1:8b</code></td>
+            </tr>
+            <tr>
+              <td><a href="https://ollama.com/library/gemma2" target="_blank">gemma2:9b</a></td>
+              <td>5.4GB</td><td>⭐⭐⭐</td><td>8k</td>
+              <td><code class="install-cmd">ollama pull gemma2:9b</code></td>
+            </tr>
+            <tr>
+              <td><a href="https://ollama.com/library/llama3.2" target="_blank">llama3.2:3b</a></td>
+              <td>2GB</td><td>⭐⭐</td><td>128k</td>
+              <td><code class="install-cmd">ollama pull llama3.2</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="modal-tip">모델명 클릭 시 Ollama 라이브러리 페이지로 이동합니다.</p>
+        <p class="modal-tip" style="margin-top:8px;">⚠️ 로컬 모드 사용 시 Ollama CORS 설정 필요:<br>
+          <code>OLLAMA_ORIGINS=* ollama serve</code></p>
+      </div>
+    </div>
+
+    <div class="setting-group hidden" id="setting-groq">
+      <label>Groq API 키</label>
+      <input type="password" id="groq-key" placeholder="gsk_...">
+    </div>
+    <div class="setting-group hidden" id="setting-groq-model">
+      <label>Groq 모델</label>
+      <select id="groq-model"><option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option></select>
+    </div>
+  </div>
+
+  <!-- 프롬프트 템플릿 선택 -->
+  <div class="prompt-bar">
+    <select id="prompt-select"></select>
+    <button class="btn-prompt-manage" id="prompt-manage-btn">관리</button>
+  </div>
+
+  <div class="input-section">
+    <label>내용을 붙여넣으세요</label>
+    <textarea id="meeting-text" placeholder="텍스트를 붙여넣으세요..."></textarea>
+    <button class="btn-submit" id="submit-btn">요약하기</button>
+  </div>
+
+  <!-- 프롬프트 관리 모달 -->
+  <div class="modal-overlay hidden" id="prompt-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3>프롬프트 템플릿 관리</h3>
+        <button class="modal-close" id="prompt-modal-close">✕</button>
+      </div>
+
+      <div class="prompt-modal-body">
+        <div class="prompt-list" id="prompt-list"></div>
+        <div class="prompt-form" id="prompt-form">
+          <h4 id="prompt-form-title">새 템플릿 추가</h4>
+          <input type="hidden" id="prompt-edit-id">
+          <div class="form-group">
+            <label>이름</label>
+            <input type="text" id="prompt-name" placeholder="예) 보고서 요약">
+          </div>
+          <div class="form-group">
+            <label>시스템 프롬프트 (AI 역할 지정)</label>
+            <textarea id="prompt-system" rows="2" placeholder="예) 당신은 문서 요약 전문가입니다."></textarea>
+          </div>
+          <div class="form-group">
+            <label>유저 프롬프트 <span class="hint">({text} 는 입력한 내용으로 자동 대체)</span></label>
+            <textarea id="prompt-user" rows="5" placeholder="예) 다음 내용을 요약해주세요:&#10;&#10;{text}"></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-cancel" id="prompt-form-cancel">취소</button>
+            <button class="btn-save" id="prompt-form-save">저장</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-add-prompt" id="prompt-add-btn">+ 새 템플릿 추가</button>
+
+      <div class="import-export-section">
+        <button class="btn-export" id="export-btn">📤 내보내기</button>
+        <button class="btn-import" id="import-btn">📥 가져오기</button>
+        <input type="file" id="import-file" accept=".json" class="hidden">
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results"></div>
+
+</div>
+
+<script src="prompts.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
